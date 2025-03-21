@@ -1,17 +1,20 @@
-# SPDX-License-Identifier: GPL-2.0-only
 #
-# Copyright (C) 2021-2022 ImmortalWrt.org
+# Copyright (C) 2021 ImmortalWrt
+#
+# This is free software, licensed under the GNU General Public License v3.
+# See /LICENSE for more information.
+#
 
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=rtl8192eu
-PKG_RELEASE:=$(AUTORELEASE)
+PKG_RELEASE:=1
 
 PKG_SOURCE_URL:=https://github.com/Mange/rtl8192eu-linux-driver.git
 PKG_SOURCE_PROTO:=git
-PKG_SOURCE_DATE:=2022-12-26
-PKG_SOURCE_VERSION:=aeed529c77282cc0d8a2b6eb29186711e25555ce
-PKG_MIRROR_HASH:=83a158ecdc9c1642d4fbad9647d6b6853067a91a25b499a1a7dd719b556ccbe5
+PKG_SOURCE_DATE:=2021-05-12
+PKG_SOURCE_VERSION:=546419675335bb80d4548e22ccef915573a5a1e2
+PKG_MIRROR_HASH:=a425a934d973aad20bc51ab2d1131bb81d2c6ebab687a029310e78cf9c81c4f3
 
 PKG_BUILD_PARALLEL:=1
 
@@ -28,8 +31,7 @@ define KernelPackage/rtl8192eu
   AUTOLOAD:=$(call AutoProbe,rtl8192eu)
 endef
 
-NOSTDINC_FLAGS:= \
-	$(KERNEL_NOSTDINC_FLAGS) \
+NOSTDINC_FLAGS = \
 	-I$(PKG_BUILD_DIR) \
 	-I$(PKG_BUILD_DIR)/include \
 	-I$(STAGING_DIR)/usr/include/mac80211-backport \
@@ -39,7 +41,7 @@ NOSTDINC_FLAGS:= \
 	-include backport/autoconf.h \
 	-include backport/backport.h
 
-NOSTDINC_FLAGS+= \
+EXTRA_CFLAGS:= \
 	-DRTW_SINGLE_WIPHY \
 	-DRTW_USE_CFG80211_STA_EVENT \
 	-DCONFIG_IOCTL_CFG80211 \
@@ -47,17 +49,25 @@ NOSTDINC_FLAGS+= \
 	-DBUILD_OPENWRT
 
 ifeq ($(CONFIG_BIG_ENDIAN),y)
-NOSTDINC_FLAGS += -DCONFIG_BIG_ENDIAN
+EXTRA_CFLAGS += -DCONFIG_BIG_ENDIAN
 else
-NOSTDINC_FLAGS += -DCONFIG_LITTLE_ENDIAN
+EXTRA_CFLAGS += -DCONFIG_LITTLE_ENDIAN
 endif
 
+EXTRA_KCONFIG:= \
+	CONFIG_RTL8192EU=m \
+	USER_MODULE_NAME=rtl8192eu
+
+MAKE_OPTS:= \
+	$(KERNEL_MAKE_FLAGS) \
+	M="$(PKG_BUILD_DIR)" \
+	NOSTDINC_FLAGS="$(NOSTDINC_FLAGS)" \
+	USER_EXTRA_CFLAGS="$(EXTRA_CFLAGS)" \
+	$(EXTRA_KCONFIG)
+
 define Build/Compile
-	+$(KERNEL_MAKE) $(PKG_JOBS) \
-		M="$(PKG_BUILD_DIR)" \
-		NOSTDINC_FLAGS="$(NOSTDINC_FLAGS)" \
-		CONFIG_RTL8192EU=m \
-		USER_MODULE_NAME=rtl8192eu \
+	+$(MAKE) $(PKG_JOBS) -C "$(LINUX_DIR)" \
+		$(MAKE_OPTS) \
 		modules
 endef
 

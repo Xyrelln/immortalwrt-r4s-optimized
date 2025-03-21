@@ -92,9 +92,6 @@ config HAS_MIPS16
 config RFKILL_SUPPORT
 	bool
 
-config EMMC_SUPPORT
-	bool
-
 config NAND_SUPPORT
 	bool
 

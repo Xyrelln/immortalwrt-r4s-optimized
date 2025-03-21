@@ -5,11 +5,6 @@
 include $(TOPDIR)/rules.mk
 include $(INCLUDE_DIR)/image.mk
 
-define Device/dsa-migration
-  DEVICE_COMPAT_VERSION := 1.1
-  DEVICE_COMPAT_MESSAGE := Config cannot be migrated from swconfig to DSA
-endef
-
 define Image/Prepare
 	rm -f $(KDIR)/fs_mark
 	echo -ne '\xde\xad\xc0\xde' > $(KDIR)/fs_mark
@@ -116,7 +111,7 @@ DEVICE_VARS += SIGNATURE
 DEVICE_VARS += NETGEAR_BOARD_ID NETGEAR_REGION TPLINK_BOARD
 DEVICE_VARS += LUXUL_BOARD
 
-IEEE8021X := wpad-openssl
+IEEE8021X := wpad-basic-openssl
 B43 := $(IEEE8021X) kmod-b43
 BRCMFMAC_43602A1 := $(IEEE8021X) kmod-brcmfmac brcmfmac-firmware-43602a1-pcie
 BRCMFMAC_4366B1 := $(IEEE8021X) kmod-brcmfmac brcmfmac-firmware-4366b1-pcie
@@ -126,7 +121,6 @@ USB2_PACKAGES += kmod-usb-ledtrig-usbport
 USB3_PACKAGES := $(USB2_PACKAGES) kmod-usb3 kmod-phy-bcm-ns-usb3
 
 define Device/Default
-  PROFILES = Generic $$(DEVICE_NAME)
   # .dtb files are prefixed by SoC type, e.g. bcm4708- which is not included in device/image names
   # extract the full dtb name based on the device info
   DEVICE_DTS := $(patsubst %.dtb,%,$(notdir $(wildcard $(if $(IB),$(KDIR),$(DTS_DIR))/*-$(subst _,-,$(1)).dtb)))
@@ -144,20 +138,10 @@ define Device/Default
 endef
 
 define Device/asus
-  $(Device/dsa-migration)
   DEVICE_VENDOR := ASUS
   IMAGES := trx
   IMAGE/trx := append-ubi | trx-nand | asus-trx
 endef
-
-define Device/asus_rt-ac3100
-  $(call Device/asus)
-  DEVICE_MODEL := RT-AC3100
-  DEVICE_PACKAGES := $(BRCMFMAC_4366B1) $(BRCMFMAC_4366C0) $(USB3_PACKAGES)
-  ASUS_PRODUCTID := RT-AC3100
-  DEFAULT := n
-endef
-TARGET_DEVICES += asus_rt-ac3100
 
 define Device/asus_rt-ac56u
   $(call Device/asus)
@@ -183,14 +167,6 @@ define Device/asus_rt-ac87u
 endef
 TARGET_DEVICES += asus_rt-ac87u
 
-define Device/asus_rt-ac88u
-  $(call Device/asus)
-  DEVICE_MODEL := RT-AC88U
-  DEVICE_PACKAGES := $(BRCMFMAC_4366B1) $(BRCMFMAC_4366C0) $(USB3_PACKAGES)
-  ASUS_PRODUCTID := RT-AC88U
-endef
-TARGET_DEVICES += asus_rt-ac88u
-
 define Device/asus_rt-n18u
   $(call Device/asus)
   DEVICE_MODEL := RT-N18U
@@ -205,7 +181,6 @@ TARGET_DEVICES += asus_rt-n18u
 # TRX with initramfs kernel. It's not possible right now so let's just build
 # plain initramfs kernel as it may be more useful.
 define Device/buffalo/Default
-  $(Device/dsa-migration)
   DEVICE_VENDOR := Buffalo
   KERNEL_INITRAMFS_SUFFIX = $$(KERNEL_SUFFIX)
   KERNEL_INITRAMFS = $$(KERNEL)
@@ -254,7 +229,6 @@ endef
 TARGET_DEVICES += buffalo_wzr-1750dhp
 
 define Device/dlink
-  $(Device/dsa-migration)
   DEVICE_VENDOR := D-Link
   IMAGES := bin
   IMAGE/bin := append-ubi | seama-nand
@@ -269,7 +243,6 @@ endef
 TARGET_DEVICES += dlink_dir-885l
 
 define Device/linksys_ea6300-v1
-  $(Device/dsa-migration)
   DEVICE_VENDOR := Linksys
   DEVICE_MODEL := EA6300
   DEVICE_VARIANT := v1
@@ -278,7 +251,6 @@ endef
 TARGET_DEVICES += linksys_ea6300-v1
 
 define Device/linksys_ea6500-v2
-  $(Device/dsa-migration)
   DEVICE_VENDOR := Linksys
   DEVICE_MODEL := EA6500
   DEVICE_VARIANT := v2
@@ -287,7 +259,6 @@ endef
 TARGET_DEVICES += linksys_ea6500-v2
 
 define Device/linksys_ea9200
-  $(Device/dsa-migration)
   DEVICE_VENDOR := Linksys
   DEVICE_MODEL := EA9200
   DEVICE_VARIANT := v1
@@ -296,7 +267,6 @@ endef
 TARGET_DEVICES += linksys_ea9200
 
 define Device/linksys_ea9500
-  $(Device/dsa-migration)
   DEVICE_VENDOR := Linksys
   DEVICE_MODEL := EA9500
   DEVICE_PACKAGES := $(BRCMFMAC_4366C0) $(USB3_PACKAGES)
@@ -305,7 +275,6 @@ endef
 TARGET_DEVICES += linksys_ea9500
 
 define Device/luxul
-  $(Device/dsa-migration)
   DEVICE_VENDOR := Luxul
   IMAGES := lxl
   IMAGE/lxl := append-ubi | trx-nand | luxul-lxl
@@ -346,7 +315,6 @@ endef
 TARGET_DEVICES += luxul_xwr-3150
 
 define Device/meraki_mr32
-  $(Device/dsa-migration)
   DEVICE_VENDOR := Meraki
   DEVICE_MODEL := MR32
   DEVICE_PACKAGES := $(B43) kmod-i2c-bcm-iproc kmod-i2c-gpio kmod-eeprom-at24 \
@@ -372,7 +340,6 @@ endef
 TARGET_DEVICES += meraki_mr32
 
 define Device/netgear
-  $(Device/dsa-migration)
   DEVICE_VENDOR := NETGEAR
   IMAGES := chk
   IMAGE/chk := append-ubi | trx-nand | netgear-chk
@@ -430,7 +397,6 @@ endef
 TARGET_DEVICES += netgear_r8500
 
 define Device/smartrg_sr400ac
-  $(Device/dsa-migration)
   DEVICE_VENDOR := SmartRG
   DEVICE_MODEL := SR400ac
   DEVICE_PACKAGES := $(BRCMFMAC_43602A1) $(USB3_PACKAGES)
@@ -442,7 +408,6 @@ endef
 TARGET_DEVICES += smartrg_sr400ac
 
 define Device/phicomm_k3
-  $(Device/dsa-migration)
   DEVICE_VENDOR := PHICOMM
   DEVICE_MODEL := K3
   DEVICE_PACKAGES := $(BRCMFMAC_4366C0) $(USB3_PACKAGES) luci-app-k3screenctrl
@@ -451,7 +416,6 @@ endef
 TARGET_DEVICES += phicomm_k3
 
 define Device/tenda_ac9
-  $(Device/dsa-migration)
   DEVICE_VENDOR := Tenda
   DEVICE_MODEL := AC9
   DEVICE_PACKAGES := $(B43) $(USB2_PACKAGES)
@@ -461,7 +425,6 @@ endef
 TARGET_DEVICES += tenda_ac9
 
 define Device/tplink_archer-c5-v2
-  $(Device/dsa-migration)
   DEVICE_VENDOR := TP-Link
   DEVICE_MODEL := Archer C5
   DEVICE_VARIANT := v2
@@ -474,7 +437,6 @@ endef
 TARGET_DEVICES += tplink_archer-c5-v2
 
 define Device/tplink_archer-c9-v1
-  $(Device/dsa-migration)
   DEVICE_VENDOR := TP-Link
   DEVICE_MODEL := Archer C9
   DEVICE_VARIANT := v1

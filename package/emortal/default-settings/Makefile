@@ -4,7 +4,7 @@
 # Copyright (C) 2021 ImmortalWrt
 # <https://immortalwrt.org>
 #
-# This is free software, licensed under the GNU General Public License v2.
+# This is free software, licensed under the GNU General Public License v3.
 # See /LICENSE for more information.
 #
 
@@ -22,7 +22,6 @@ define Package/default-settings
   SECTION:=luci
   CATEGORY:=LuCI
   TITLE:=LuCI support for Default Settings
-  DEPENDS:=+luci
   PKGARCH:=all
   DEPENDS:=+luci-lib-base
 endef
@@ -30,13 +29,16 @@ endef
 define Package/default-settings-chn
   $(Package/default-settings)
   TITLE+= (Optimize for CHN users)
-  DEPENDS:=+default-settings +@LUCI_LANG_zh_Hans +luci-i18n-base-zh-cn
+  DEPENDS:=+default-settings +@LUCI_LANG_zh_Hans
 endef
 
 define Build/Compile
 endef
 
 define Package/default-settings/install
+	$(INSTALL_DIR) $(1)/etc
+	$(INSTALL_DATA) ./files/openwrt_banner $(1)/etc/openwrt_banner
+
 	$(INSTALL_DIR) $(1)/etc/uci-defaults
 	$(INSTALL_BIN) ./files/99-default-settings $(1)/etc/uci-defaults/
 endef

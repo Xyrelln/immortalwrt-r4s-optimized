@@ -78,6 +78,6 @@
 &wmac {
 	status = "okay";
 
-	ieee80211-freq-limit = <2402000 2482000>;
+	qca,disable-5ghz;
 	mtd-cal-data = <&art 0x1000>;
 };

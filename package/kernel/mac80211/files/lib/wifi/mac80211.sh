@@ -1,4 +1,5 @@
 #!/bin/sh
+. /lib/netifd/mac80211.sh
 
 append DRIVERS "mac80211"
 
@@ -10,7 +11,7 @@ lookup_phy() {
 	local devpath
 	config_get devpath "$device" path
 	[ -n "$devpath" ] && {
-		phy="$(iwinfo nl80211 phyname "path=$devpath")"
+		phy="$(mac80211_path_to_phy "$devpath")"
 		[ -n "$phy" ] && return
 	}
 
@@ -160,7 +161,7 @@ detect_mac80211() {
 
 		get_band_defaults "$dev"
 
-		path="$(iwinfo nl80211 path "$dev")"
+		path="$(mac80211_phy_to_path "$dev")"
 		if [ -n "$path" ]; then
 			dev_id="set wireless.radio${devidx}.path='$path'"
 		else
@@ -174,14 +175,13 @@ detect_mac80211() {
 			set wireless.radio${devidx}.channel=${channel}
 			set wireless.radio${devidx}.band=${mode_band}
 			set wireless.radio${devidx}.htmode=$htmode
-			set wireless.radio${devidx}.country=CN
 			set wireless.radio${devidx}.disabled=0
 
 			set wireless.default_radio${devidx}=wifi-iface
 			set wireless.default_radio${devidx}.device=radio${devidx}
 			set wireless.default_radio${devidx}.network=lan
 			set wireless.default_radio${devidx}.mode=ap
-			set wireless.default_radio${devidx}.ssid=ImmortalWrt
+			set wireless.default_radio${devidx}.ssid=OpenWrt
 			set wireless.default_radio${devidx}.encryption=none
 EOF
 		uci -q commit wireless

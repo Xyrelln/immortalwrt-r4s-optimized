@@ -34,7 +34,6 @@ ramips_setup_interfaces()
 			"0:lan" "1:lan" "2:lan" "3:lan" "4:wan" "6@eth0"
 		;;
 	alfa-network,r36m-e4g|\
-	bolt,bl201|\
 	zbtlink,zbt-we1026-h-32m)
 		ucidef_add_switch "switch0" \
 			"3:lan" "4:wan" "6@eth0"
@@ -135,8 +134,7 @@ ramips_setup_interfaces()
 		ucidef_add_switch "switch1" \
 			"1:lan" "2:lan" "3:lan" "4:lan" "0:wan" "6@eth0"
 		;;
-	engenius,esr600|\
-	sitecom,wlr-4100-v1-002)
+	engenius,esr600)
 		ucidef_add_switch "switch0" \
 			"1:lan:4" "2:lan:3" "3:lan:2" "4:lan:1" "5:wan" "0@eth0"
 		ucidef_add_switch "switch1" \
